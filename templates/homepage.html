@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script>
+
+	function qualifyURL(url) {
+	var a = document.createElement('a');
+	a.href = url;
+	return a.href;
+	}
+	</script>
+
+   <style>
+.center {
+    margin: 50px;
+    width: 60%;
+    border: 3px solid #73AD21;
+    padding: 10px;
+}
+</style>
+    
+      
+</head>
+
+
+<body>
+
+<form action="https://app.hubspot.com/auth/authenticate" class="center">
+<div style="display:none">
+client: <input type="text" name="client_id" value="32d1475b-20df-11e5-8bdb-532b010dd8d8"><br>
+redirect_uri: <input type="text" name="redirect_uri" value="http://superrecipebuilder.appspot.com/auth" <br>
+scope: <input type="text" name="scope" value="contacts-rw+offline"><br>
+</div>
+Portal ID: <input type="text" name="portalId" value="Enter Portal ID"><br>
+<input type="submit" value="Submit">
+</form>
+
+
+</body>
+</html>
+
+
