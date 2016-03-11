@@ -1,5 +1,4 @@
 import webapp2
-import requests
 
 import os
 import urllib2
@@ -106,26 +105,26 @@ class LoadIndustry(webapp2.RequestHandler):
 
         #Define the workflows, probably need a seperate function?
 
-        ecomm_payload = """{"name":"Ecomm WF ","actions":[{"type":"WEBHOOK","url":"http://requestb.in/w72r6aw7","method":"POST","authCreds":{},"actionId":1076477,"name":"Webhook","stepListId":429,"stepId":1046041},{"type":"DELAY","delayMillis":60000,"stepListId":586,"stepId":1683866}],"id":672745,"type":"DRIP_DELAY","enabled":false,"portalId":161221,"isSegmentBased":true,"listening":false,"internalStartingListId":590,"onlyExecOnBizDays":false,"nurtureTimeRange":{"enabled":false,"startHour":9,"stopHour":10},"updatedAt":1447358804827,"insertedAt":1418227922690,"enrollOnCriteriaUpdate":false,"goalCriteriaEnabled":true,"allowContactToTriggerMultipleTimes":true,"unenrollmentSetting":{"type":"NONE","excludedWorkflows":[]},"recurringSetting":{"type":"NONE"},"canEnrollFromSalesforce":true,"segmentCriteria":[[{"checkPastVersions":false,"form":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","filterFamily":"FormSubmission","withinTimeMode":"PAST","value":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","operator":"HAS_FILLED_OUT_FORM"}]],"onlyEnrollsManually":false,"goalCriteria":[],"reEnrollmentTriggerSets":[[{"name":"AY Store Purchases","id":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","type":"FORM","filters":[],"enrollContactsOnActivation":false}]],"triggerSets":[[{"name":"AY Store Purchases","id":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","type":"FORM","filters":[],"enrollContactsOnActivation":false}]],"suppressionListIds":[],"lastUpdatedBy":"shaase@hubspot.com","metaData":{"triggeredByWorkflowIds":[],"succeededListId":428}}"""
-        media_payload = """{"name":"Media WF ","actions":[{"type":"WEBHOOK","url":"http://requestb.in/w72r6aw7","method":"POST","authCreds":{},"actionId":1076477,"name":"Webhook","stepListId":429,"stepId":1046041},{"type":"DELAY","delayMillis":60000,"stepListId":586,"stepId":1683866}],"id":672745,"type":"DRIP_DELAY","enabled":false,"portalId":161221,"isSegmentBased":true,"listening":false,"internalStartingListId":590,"onlyExecOnBizDays":false,"nurtureTimeRange":{"enabled":false,"startHour":9,"stopHour":10},"updatedAt":1447358804827,"insertedAt":1418227922690,"enrollOnCriteriaUpdate":false,"goalCriteriaEnabled":true,"allowContactToTriggerMultipleTimes":true,"unenrollmentSetting":{"type":"NONE","excludedWorkflows":[]},"recurringSetting":{"type":"NONE"},"canEnrollFromSalesforce":true,"segmentCriteria":[[{"checkPastVersions":false,"form":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","filterFamily":"FormSubmission","withinTimeMode":"PAST","value":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","operator":"HAS_FILLED_OUT_FORM"}]],"onlyEnrollsManually":false,"goalCriteria":[],"reEnrollmentTriggerSets":[[{"name":"AY Store Purchases","id":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","type":"FORM","filters":[],"enrollContactsOnActivation":false}]],"triggerSets":[[{"name":"AY Store Purchases","id":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","type":"FORM","filters":[],"enrollContactsOnActivation":false}]],"suppressionListIds":[],"lastUpdatedBy":"shaase@hubspot.com","metaData":{"triggeredByWorkflowIds":[],"succeededListId":428}}"""
-        reporting_payload = """{"name":"Reporting WF ","actions":[{"type":"WEBHOOK","url":"http://requestb.in/w72r6aw7","method":"POST","authCreds":{},"actionId":1076477,"name":"Webhook","stepListId":429,"stepId":1046041},{"type":"DELAY","delayMillis":60000,"stepListId":586,"stepId":1683866}],"id":672745,"type":"DRIP_DELAY","enabled":false,"portalId":161221,"isSegmentBased":true,"listening":false,"internalStartingListId":590,"onlyExecOnBizDays":false,"nurtureTimeRange":{"enabled":false,"startHour":9,"stopHour":10},"updatedAt":1447358804827,"insertedAt":1418227922690,"enrollOnCriteriaUpdate":false,"goalCriteriaEnabled":true,"allowContactToTriggerMultipleTimes":true,"unenrollmentSetting":{"type":"NONE","excludedWorkflows":[]},"recurringSetting":{"type":"NONE"},"canEnrollFromSalesforce":true,"segmentCriteria":[[{"checkPastVersions":false,"form":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","filterFamily":"FormSubmission","withinTimeMode":"PAST","value":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","operator":"HAS_FILLED_OUT_FORM"}]],"onlyEnrollsManually":false,"goalCriteria":[],"reEnrollmentTriggerSets":[[{"name":"AY Store Purchases","id":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","type":"FORM","filters":[],"enrollContactsOnActivation":false}]],"triggerSets":[[{"name":"AY Store Purchases","id":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","type":"FORM","filters":[],"enrollContactsOnActivation":false}]],"suppressionListIds":[],"lastUpdatedBy":"shaase@hubspot.com","metaData":{"triggeredByWorkflowIds":[],"succeededListId":428}}"""
-        agency_payload = """{"name":"Agency WF ","actions":[{"type":"WEBHOOK","url":"http://requestb.in/w72r6aw7","method":"POST","authCreds":{},"actionId":1076477,"name":"Webhook","stepListId":429,"stepId":1046041},{"type":"DELAY","delayMillis":60000,"stepListId":586,"stepId":1683866}],"id":672745,"type":"DRIP_DELAY","enabled":false,"portalId":161221,"isSegmentBased":true,"listening":false,"internalStartingListId":590,"onlyExecOnBizDays":false,"nurtureTimeRange":{"enabled":false,"startHour":9,"stopHour":10},"updatedAt":1447358804827,"insertedAt":1418227922690,"enrollOnCriteriaUpdate":false,"goalCriteriaEnabled":true,"allowContactToTriggerMultipleTimes":true,"unenrollmentSetting":{"type":"NONE","excludedWorkflows":[]},"recurringSetting":{"type":"NONE"},"canEnrollFromSalesforce":true,"segmentCriteria":[[{"checkPastVersions":false,"form":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","filterFamily":"FormSubmission","withinTimeMode":"PAST","value":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","operator":"HAS_FILLED_OUT_FORM"}]],"onlyEnrollsManually":false,"goalCriteria":[],"reEnrollmentTriggerSets":[[{"name":"AY Store Purchases","id":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","type":"FORM","filters":[],"enrollContactsOnActivation":false}]],"triggerSets":[[{"name":"AY Store Purchases","id":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","type":"FORM","filters":[],"enrollContactsOnActivation":false}]],"suppressionListIds":[],"lastUpdatedBy":"shaase@hubspot.com","metaData":{"triggeredByWorkflowIds":[],"succeededListId":428}}"""
+        ecomm_wf = open('./workflows/ecommerce.json', 'r').read()
+        media_wf = open('./workflows/media.json', 'r').read()
+        reporting_wf = open('./workflows/reporting.json', 'r').read()
+        agency_wf = open('./workflows/agency.json', 'r').read()
 
 
         #for each workflow, add the right one to the payload
         for wf in workflows_chosen:
             if str(wf) == "Media":
-                logging.info("A match! Media")
-                payload_list.append(media_payload)
+                logging.info("A match! Media, from file")
+                payload_list.append(media_wf)
             elif str(wf) == "Ecommerce":
-                logging.info("A match! Ecommerce")
-                payload_list.append(ecomm_payload)
+                logging.info("A match! Ecommerce, from file")
+                payload_list.append(ecomm_wf)
             elif str(wf) == "Reporting":
-                logging.info("A match! Reporting")
-                payload_list.append(reporting_payload)
+                logging.info("A match! Reporting, from file")
+                payload_list.append(reporting_wf)
             elif str(wf) == "Agency":
-                logging.info("A match! Agency")
-                payload_list.append(agency_payload)
+                logging.info("A match! Agency, from file")
+                payload_list.append(agency_wf)
 
 
         proplist = []
