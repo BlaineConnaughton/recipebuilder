@@ -12,10 +12,6 @@ from google.appengine.api import memcache
 import json
 import jinja2
 
-handler = urllib2.HTTPHandler(debuglevel=1)
-opener = urllib2.build_opener(handler)
-urllib2.install_opener(opener)
-
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'])
