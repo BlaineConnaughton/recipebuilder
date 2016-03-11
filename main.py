@@ -2,7 +2,7 @@ import webapp2
 import requests
 
 import os
-import urllib
+import urllib2
 import logging
 
 from google.appengine.api import users
@@ -11,6 +11,10 @@ from google.appengine.api import memcache
 
 import json
 import jinja2
+
+handler = urllib2.HTTPHandler(debuglevel=1)
+opener = urllib2.build_opener(handler)
+urllib2.install_opener(opener)
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -57,8 +61,9 @@ def Create_Properties(propertyList):
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
+        template_values = {"host": self.request.host}
         template = JINJA_ENVIRONMENT.get_template('templates/homepage.html')
-        self.response.write(template.render())
+        self.response.write(template.render(template_values))
 
 class Authorize(webapp2.RequestHandler):
   #https://app.hubspot.com/auth/authenticate?client_id=32d1475b-20df-11e5-8bdb-532b010dd8d8&portalId=292568&redirect_uri=http://scribedynamics.appspot.com/auth&scope=contacts-rw+offline
@@ -97,91 +102,59 @@ class LoadIndustry(webapp2.RequestHandler):
         token = memcache.get('token')
         logging.info(token)
 
+        #instantiate the payload
+        payload_list = []
+
+        #see what they selected for workflows
+        workflows_chosen = self.request.get_all('industry')
+
+        #Define the workflows, probably need a seperate function?
+
+        ecomm_payload = """{"name":"Ecomm WF ","actions":[{"type":"WEBHOOK","url":"http://requestb.in/w72r6aw7","method":"POST","authCreds":{},"actionId":1076477,"name":"Webhook","stepListId":429,"stepId":1046041},{"type":"DELAY","delayMillis":60000,"stepListId":586,"stepId":1683866}],"id":672745,"type":"DRIP_DELAY","enabled":false,"portalId":161221,"isSegmentBased":true,"listening":false,"internalStartingListId":590,"onlyExecOnBizDays":false,"nurtureTimeRange":{"enabled":false,"startHour":9,"stopHour":10},"updatedAt":1447358804827,"insertedAt":1418227922690,"enrollOnCriteriaUpdate":false,"goalCriteriaEnabled":true,"allowContactToTriggerMultipleTimes":true,"unenrollmentSetting":{"type":"NONE","excludedWorkflows":[]},"recurringSetting":{"type":"NONE"},"canEnrollFromSalesforce":true,"segmentCriteria":[[{"checkPastVersions":false,"form":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","filterFamily":"FormSubmission","withinTimeMode":"PAST","value":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","operator":"HAS_FILLED_OUT_FORM"}]],"onlyEnrollsManually":false,"goalCriteria":[],"reEnrollmentTriggerSets":[[{"name":"AY Store Purchases","id":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","type":"FORM","filters":[],"enrollContactsOnActivation":false}]],"triggerSets":[[{"name":"AY Store Purchases","id":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","type":"FORM","filters":[],"enrollContactsOnActivation":false}]],"suppressionListIds":[],"lastUpdatedBy":"shaase@hubspot.com","metaData":{"triggeredByWorkflowIds":[],"succeededListId":428}}"""
+        media_payload = """{"name":"Media WF ","actions":[{"type":"WEBHOOK","url":"http://requestb.in/w72r6aw7","method":"POST","authCreds":{},"actionId":1076477,"name":"Webhook","stepListId":429,"stepId":1046041},{"type":"DELAY","delayMillis":60000,"stepListId":586,"stepId":1683866}],"id":672745,"type":"DRIP_DELAY","enabled":false,"portalId":161221,"isSegmentBased":true,"listening":false,"internalStartingListId":590,"onlyExecOnBizDays":false,"nurtureTimeRange":{"enabled":false,"startHour":9,"stopHour":10},"updatedAt":1447358804827,"insertedAt":1418227922690,"enrollOnCriteriaUpdate":false,"goalCriteriaEnabled":true,"allowContactToTriggerMultipleTimes":true,"unenrollmentSetting":{"type":"NONE","excludedWorkflows":[]},"recurringSetting":{"type":"NONE"},"canEnrollFromSalesforce":true,"segmentCriteria":[[{"checkPastVersions":false,"form":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","filterFamily":"FormSubmission","withinTimeMode":"PAST","value":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","operator":"HAS_FILLED_OUT_FORM"}]],"onlyEnrollsManually":false,"goalCriteria":[],"reEnrollmentTriggerSets":[[{"name":"AY Store Purchases","id":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","type":"FORM","filters":[],"enrollContactsOnActivation":false}]],"triggerSets":[[{"name":"AY Store Purchases","id":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","type":"FORM","filters":[],"enrollContactsOnActivation":false}]],"suppressionListIds":[],"lastUpdatedBy":"shaase@hubspot.com","metaData":{"triggeredByWorkflowIds":[],"succeededListId":428}}"""
+        reporting_payload = """{"name":"Reporting WF ","actions":[{"type":"WEBHOOK","url":"http://requestb.in/w72r6aw7","method":"POST","authCreds":{},"actionId":1076477,"name":"Webhook","stepListId":429,"stepId":1046041},{"type":"DELAY","delayMillis":60000,"stepListId":586,"stepId":1683866}],"id":672745,"type":"DRIP_DELAY","enabled":false,"portalId":161221,"isSegmentBased":true,"listening":false,"internalStartingListId":590,"onlyExecOnBizDays":false,"nurtureTimeRange":{"enabled":false,"startHour":9,"stopHour":10},"updatedAt":1447358804827,"insertedAt":1418227922690,"enrollOnCriteriaUpdate":false,"goalCriteriaEnabled":true,"allowContactToTriggerMultipleTimes":true,"unenrollmentSetting":{"type":"NONE","excludedWorkflows":[]},"recurringSetting":{"type":"NONE"},"canEnrollFromSalesforce":true,"segmentCriteria":[[{"checkPastVersions":false,"form":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","filterFamily":"FormSubmission","withinTimeMode":"PAST","value":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","operator":"HAS_FILLED_OUT_FORM"}]],"onlyEnrollsManually":false,"goalCriteria":[],"reEnrollmentTriggerSets":[[{"name":"AY Store Purchases","id":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","type":"FORM","filters":[],"enrollContactsOnActivation":false}]],"triggerSets":[[{"name":"AY Store Purchases","id":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","type":"FORM","filters":[],"enrollContactsOnActivation":false}]],"suppressionListIds":[],"lastUpdatedBy":"shaase@hubspot.com","metaData":{"triggeredByWorkflowIds":[],"succeededListId":428}}"""
+        agency_payload = """{"name":"Agency WF ","actions":[{"type":"WEBHOOK","url":"http://requestb.in/w72r6aw7","method":"POST","authCreds":{},"actionId":1076477,"name":"Webhook","stepListId":429,"stepId":1046041},{"type":"DELAY","delayMillis":60000,"stepListId":586,"stepId":1683866}],"id":672745,"type":"DRIP_DELAY","enabled":false,"portalId":161221,"isSegmentBased":true,"listening":false,"internalStartingListId":590,"onlyExecOnBizDays":false,"nurtureTimeRange":{"enabled":false,"startHour":9,"stopHour":10},"updatedAt":1447358804827,"insertedAt":1418227922690,"enrollOnCriteriaUpdate":false,"goalCriteriaEnabled":true,"allowContactToTriggerMultipleTimes":true,"unenrollmentSetting":{"type":"NONE","excludedWorkflows":[]},"recurringSetting":{"type":"NONE"},"canEnrollFromSalesforce":true,"segmentCriteria":[[{"checkPastVersions":false,"form":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","filterFamily":"FormSubmission","withinTimeMode":"PAST","value":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","operator":"HAS_FILLED_OUT_FORM"}]],"onlyEnrollsManually":false,"goalCriteria":[],"reEnrollmentTriggerSets":[[{"name":"AY Store Purchases","id":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","type":"FORM","filters":[],"enrollContactsOnActivation":false}]],"triggerSets":[[{"name":"AY Store Purchases","id":"b0578b9e-1dd4-4a68-9108-f1cea615f9ef","type":"FORM","filters":[],"enrollContactsOnActivation":false}]],"suppressionListIds":[],"lastUpdatedBy":"shaase@hubspot.com","metaData":{"triggeredByWorkflowIds":[],"succeededListId":428}}"""
+
+
+        #for each workflow, add the right one to the payload
+        for wf in workflows_chosen:
+            if str(wf) == "Media":
+                logging.info("A match! Media")
+                payload_list.append(media_payload)
+            elif str(wf) == "Ecommerce":
+                logging.info("A match! Ecommerce")
+                payload_list.append(ecomm_payload)
+            elif str(wf) == "Reporting":
+                logging.info("A match! Reporting")
+                payload_list.append(reporting_payload)
+            elif str(wf) == "Agency":
+                logging.info("A match! Agency")
+                payload_list.append(agency_payload)
+
+
         proplist = []
         Create_Properties(proplist)
 
 
-        #Next create the workflows, probably need a seperate function?
+        logging.info(payload_list)
 
-        payload = """
+        headers = {"content-type":"application/json"}
 
-name: "Update Email clicked EXAMPLE FROM APP",
-actions: [
-{
-type: "COPY_PROPERTY",
-sourceProperty: "hs_email_last_email_name",
-targetProperty: "last_email_clicked",
-targetModel: "CONTACT",
-actionId: 2119607,
-name: "Copy property",
-stepListId: 1358,
-stepId: 2110984
-}
-],
-id: 1116257,
-type: "DRIP_DELAY",
-enabled: false,
-portalId: 292568,
-onlyExecOnBizDays: false,
-nurtureTimeRange: {
-enabled: false,
-startHour: 9,
-stopHour: 10
-},
-isSegmentBased: true,
-listening: false,
-internalStartingListId: 1357,
-updatedAt: 1455718769218,
-insertedAt: 1455716414584,
-allowContactToTriggerMultipleTimes: true,
-unenrollmentSetting: {
-type: "NONE",
-excludedWorkflows: [ ]
-},
-recurringSetting: {
-type: "NONE"
-},
-originalAuthorUserId: 474212,
-enrollOnCriteriaUpdate: false,
-onlyEnrollsManually: false,
-goalCriteriaEnabled: false,
-segmentCriteria: [
-[
-{
-withinTimeMode: "PAST",
-filterFamily: "PropertyValue",
-property: "hs_email_last_click_date",
-type: "datetime",
-operator: "IS_NOT_EMPTY"
-}
-]
-],
-goalCriteria: [ ],
-reEnrollmentTriggerSets: [
-[
-{
-name: "Last email click date",
-id: "hs_email_last_click_date",
-type: "CONTACT_PROPERTY_NAME"
-}
-]
-],
-triggerSets: [ ],
-suppressionListIds: [ ],
-lastUpdatedBy: "bconnaughton@hubspot.com",
-metaData: {
-triggeredByWorkflowIds: [ ],
-succeededListId: 1348
-}
-}
-        """
+        for payload in payload_list:
+            url = "https://api.hubapi.com/automation/v3/workflows?access_token=%s" % (token)
+            r = urllib2.Request(url=url , data=payload , headers=headers)
+            
+            response = urllib2.urlopen(r)
+            logging.info(response.read())
+            response.close()
 
-        headers = {"content-header":"application/json"}
-        url = "https://api.hubapi.com/automation/v3/workflows?access_token=%s" % (token)
-        r = requests.post(url=url , data=payload , headers=headers)
+        self.response.write('heyo')
+        
+        
+        
 
 
-        self.response.write(r.content)
+        
 
 
 app = webapp2.WSGIApplication([
