@@ -1,5 +1,5 @@
-application: superrecipebuilder
-version: 1
+application: superrecipebuilder1
+version: 2
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -19,4 +19,5 @@ libraries:
   version: "2.6"
 - name: jinja2
   version: latest
-
+- name: ssl
+  version: latest

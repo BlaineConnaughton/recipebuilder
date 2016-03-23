@@ -1,8 +1,7 @@
 import webapp2
-import requests
 
 import os
-import urllib
+import urllib2
 import logging
 
 from google.appengine.api import users
@@ -57,8 +56,9 @@ def Create_Properties(propertyList):
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
+        template_values = {"host": self.request.host}
         template = JINJA_ENVIRONMENT.get_template('templates/homepage.html')
-        self.response.write(template.render())
+        self.response.write(template.render(template_values))
 
 class Authorize(webapp2.RequestHandler):
   #https://app.hubspot.com/auth/authenticate?client_id=32d1475b-20df-11e5-8bdb-532b010dd8d8&portalId=292568&redirect_uri=http://scribedynamics.appspot.com/auth&scope=contacts-rw+offline
@@ -97,91 +97,59 @@ class LoadIndustry(webapp2.RequestHandler):
         token = memcache.get('token')
         logging.info(token)
 
+        #instantiate the payload
+        payload_list = []
+
+        #see what they selected for workflows
+        workflows_chosen = self.request.get_all('industry')
+
+        #Define the workflows, probably need a seperate function?
+
+        ecomm_wf = open('./workflows/ecommerce.json', 'r').read()
+        media_wf = open('./workflows/media.json', 'r').read()
+        reporting_wf = open('./workflows/reporting.json', 'r').read()
+        agency_wf = open('./workflows/agency.json', 'r').read()
+
+
+        #for each workflow, add the right one to the payload
+        for wf in workflows_chosen:
+            if str(wf) == "Media":
+                logging.info("A match! Media, from file")
+                payload_list.append(media_wf)
+            elif str(wf) == "Ecommerce":
+                logging.info("A match! Ecommerce, from file")
+                payload_list.append(ecomm_wf)
+            elif str(wf) == "Reporting":
+                logging.info("A match! Reporting, from file")
+                payload_list.append(reporting_wf)
+            elif str(wf) == "Agency":
+                logging.info("A match! Agency, from file")
+                payload_list.append(agency_wf)
+
+
         proplist = []
         Create_Properties(proplist)
 
 
-        #Next create the workflows, probably need a seperate function?
+        logging.info(payload_list)
 
-        payload = """
+        headers = {"content-type":"application/json"}
 
-name: "Update Email clicked EXAMPLE FROM APP",
-actions: [
-{
-type: "COPY_PROPERTY",
-sourceProperty: "hs_email_last_email_name",
-targetProperty: "last_email_clicked",
-targetModel: "CONTACT",
-actionId: 2119607,
-name: "Copy property",
-stepListId: 1358,
-stepId: 2110984
-}
-],
-id: 1116257,
-type: "DRIP_DELAY",
-enabled: false,
-portalId: 292568,
-onlyExecOnBizDays: false,
-nurtureTimeRange: {
-enabled: false,
-startHour: 9,
-stopHour: 10
-},
-isSegmentBased: true,
-listening: false,
-internalStartingListId: 1357,
-updatedAt: 1455718769218,
-insertedAt: 1455716414584,
-allowContactToTriggerMultipleTimes: true,
-unenrollmentSetting: {
-type: "NONE",
-excludedWorkflows: [ ]
-},
-recurringSetting: {
-type: "NONE"
-},
-originalAuthorUserId: 474212,
-enrollOnCriteriaUpdate: false,
-onlyEnrollsManually: false,
-goalCriteriaEnabled: false,
-segmentCriteria: [
-[
-{
-withinTimeMode: "PAST",
-filterFamily: "PropertyValue",
-property: "hs_email_last_click_date",
-type: "datetime",
-operator: "IS_NOT_EMPTY"
-}
-]
-],
-goalCriteria: [ ],
-reEnrollmentTriggerSets: [
-[
-{
-name: "Last email click date",
-id: "hs_email_last_click_date",
-type: "CONTACT_PROPERTY_NAME"
-}
-]
-],
-triggerSets: [ ],
-suppressionListIds: [ ],
-lastUpdatedBy: "bconnaughton@hubspot.com",
-metaData: {
-triggeredByWorkflowIds: [ ],
-succeededListId: 1348
-}
-}
-        """
+        for payload in payload_list:
+            url = "https://api.hubapi.com/automation/v3/workflows?access_token=%s" % (token)
+            r = urllib2.Request(url=url , data=payload , headers=headers)
+            
+            response = urllib2.urlopen(r)
+            logging.info(response.read())
+            response.close()
 
-        headers = {"content-header":"application/json"}
-        url = "https://api.hubapi.com/automation/v3/workflows?access_token=%s" % (token)
-        r = requests.post(url=url , data=payload , headers=headers)
+        self.response.write('heyo')
+        
+        
+        
 
 
-        self.response.write(r.content)
+        
 
 
 app = webapp2.WSGIApplication([
